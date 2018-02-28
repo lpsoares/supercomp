@@ -10,6 +10,7 @@ int main() {
 		acum+=1;
 		printf("Thread %d/%d, acumulando %d\n", t, n, acum);
 	}
+	printf("Valor final do acumulador %d\n", acum);
 	return 0;
 }
 
