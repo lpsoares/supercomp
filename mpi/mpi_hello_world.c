@@ -12,9 +12,9 @@ int main() {
 
   MPI_Comm_size(MPI_COMM_WORLD, &size); // recupera número de processos
 
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank); // recupera o indice(rank) do processo
+  MPI_Comm_rank(MPI_COMM_WORLD, &rank); // recupera o indice (rank) do processo
 
-  MPI_Get_processor_name(processor, &name_len); // recuper nome do processor
+  MPI_Get_processor_name(processor, &name_len); // recuper nome do processor (host) se seu tamanho
 
   printf("host: %s (rank %d de %d)\n", processor, rank, size);
 
