@@ -20,7 +20,7 @@ int main(int argc, char ** argv) {
 		MPI_Recv(b, 50, MPI_INT, 1, 0, MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 		/* Atividade: termine de ordenar os dados */
 		for(int f= 0;f< 50;f++) printf("%d\n",a[f]);
-		for(int f=50;f<100;f++) printf("%d\n",b[f]);
+		for(int f= 0;f< 50;f++) printf("%d\n",b[f]);
 		double end = MPI_Wtime();
 		printf("tempo decorrido: %f\n",end - start);
 	} else if (rank == 1) {
