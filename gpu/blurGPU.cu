@@ -1,5 +1,5 @@
 // Exemplo para o curso de Super Computacao
-// Conversao de imagens coloridas para tons de cinza
+// Gera efeito de Bluer em imagens
 // Criado por: Luciano P. Soares (10 de Abril de 2018)
 
 #include <stdio.h>
@@ -9,7 +9,7 @@
 #define MAX(y,x) (y>x?y:x)    // Calcula valor maximo
 #define MIN(y,x) (y<x?y:x)    // Calcula valor minimo
 
-/* Rotina para copiar dois vetores na GPU */ 
+/* Rotina para fazer a convolucao de um kernel de Blur */ 
 __global__ void blur(int *input, int *output, int height, int width) {
    int i=blockIdx.x*blockDim.x+threadIdx.x;
    int j=blockIdx.y*blockDim.y+threadIdx.y;
@@ -34,7 +34,7 @@ __global__ void blur(int *input, int *output, int height, int width) {
    }
 }
 
-/* Programa cria dois vetores e soma eles em GPU */
+/* Programa realiza Blur em uma imagem e salva em uma nova usando recursos de GPU */
 int main(int argc, char** argv) {
 
    int *d_imageInput, *d_imageOutput;
