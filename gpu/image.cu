@@ -76,10 +76,10 @@ void readImage(const char *file_name, PGMData *data)
 }
 
 // Grava um arquivo PGM
-void writeImage(const char *filename, const PGMData *data, unsigned char binary, int channels)
+void writeImage(const char *filename, const PGMData *data, unsigned char binary)
 {
    FILE *pgmFile;
-   int i, j;
+   int i, j, k;
  
    pgmFile = fopen(filename, "w");
    if (pgmFile == NULL) {
@@ -87,21 +87,22 @@ void writeImage(const char *filename, const PGMData *data, unsigned char binary,
       exit(EXIT_FAILURE);
    }
  
-   fprintf(pgmFile, (binary?"P5\n":"P2\n"));
+   fprintf(pgmFile, ( data->channels==3 ? (binary?"P6\n":"P3\n") : (binary?"P5\n":"P2\n") ) );
    fprintf(pgmFile, "%d %d\n", data->col, data->row);
    fprintf(pgmFile, "%d\n", data->max_intensity);
  
    for (i = 0; i < data->row; ++i) {
       for (j = 0; j < data->col; ++j) {
-         if(binary) {
-            fputc(data->matrix[i*data->col+j], pgmFile);   
-         } else {
-            fprintf(pgmFile, " %d ", data->matrix[i*data->col+j]);
+         for (k = 0; k < data->channels; k++) {
+            if(binary) {
+               fputc(data->matrix[(i*data->col+j)*data->channels+k], pgmFile);   
+            } else {
+               fprintf(pgmFile, " %d", data->matrix[(i*data->col+j)*data->channels+k]);
+            }
          }
+         if(!binary) fprintf(pgmFile, " ");
       }
-      if(!binary) {
-         fprintf(pgmFile, "\n");
-      }
+      if(!binary) fprintf(pgmFile, "\n");
    }
          
    fclose(pgmFile);

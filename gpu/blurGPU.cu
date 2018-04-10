@@ -6,14 +6,31 @@
 #include <stdlib.h>
 #include "image.h" 
 
+#define MAX(y,x) (y>x?y:x)    // Calcula valor maximo
+#define MIN(y,x) (y<x?y:x)    // Calcula valor minimo
 
 /* Rotina para copiar dois vetores na GPU */ 
-__global__ void convert3RGBtoGrayScale(int *input3RGB, int *output1GrayScale, int height, int width) {
+__global__ void blur(int *input, int *output, int height, int width) {
    int i=blockIdx.x*blockDim.x+threadIdx.x;
    int j=blockIdx.y*blockDim.y+threadIdx.y;
    if( i<width && j<height ) {   // Importante checar valor do i pois pode acessar fora do tamanho do vetor
-      int pos = j*width + i;
-      output1GrayScale[ pos ] = 0.299*input3RGB[pos*3] + 0.587*input3RGB[pos*3+1] + 0.114*input3RGB[pos*3+2];
+
+      int total[3] = {0,0,0};
+      int points = 0;
+
+      for(int di = MAX(0, i - 1); di <= MIN(i + 1, height - 1); di++) {
+         for(int dj = MAX(0, j - 1); dj <= MIN(j + 1, width - 1); dj++) {
+            int pos = dj*width + di;
+            total[0] += input[ pos*3   ];
+            total[1] += input[ pos*3+1 ];
+            total[2] += input[ pos*3+2 ];
+            points++;
+         }
+      }
+
+      output[(j*width + i)*3+0] = total[0]/points;
+      output[(j*width + i)*3+1] = total[1]/points;
+      output[(j*width + i)*3+2] = total[2]/points;
    }
 }
 
@@ -32,7 +49,7 @@ int main(int argc, char** argv) {
    readImage(argv[1],imagemIn);
 
    // Cria imagem vazia
-   createImage(imagemOut, imagemIn->row, imagemIn->col, imagemIn->max_intensity, 1);
+   createImage(imagemOut, imagemIn->row, imagemIn->col, imagemIn->max_intensity, 3);
 
    // Aloca vetores na memoria da GPU
    error = cudaMalloc((void **)&d_imageInput,imagemIn->row*imagemIn->col*imagemIn->channels*sizeof(int));
@@ -41,7 +58,7 @@ int main(int argc, char** argv) {
       exit(EXIT_FAILURE);
    }
 
-   error = cudaMalloc((void **)&d_imageOutput,imagemIn->row*imagemIn->col*sizeof(int));
+   error = cudaMalloc((void **)&d_imageOutput,imagemIn->row*imagemIn->col*imagemIn->channels*sizeof(int));
    if(error!=cudaSuccess) {
       printf("Memory Allocation CUDA failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(error));
       exit(EXIT_FAILURE);
@@ -62,10 +79,10 @@ int main(int argc, char** argv) {
    dim3 dimBlock(16, 16, 1);
 
    // Realiza conversao na GPU
-   convert3RGBtoGrayScale<<<dimGrid,dimBlock>>>(d_imageInput,d_imageOutput,imagemIn->row,imagemIn->col);
+   blur<<<dimGrid,dimBlock>>>(d_imageInput,d_imageOutput,imagemIn->row,imagemIn->col);
 
    // Retorna valores da memoria da GPU para a CPU
-   error = cudaMemcpy(imagemOut->matrix, d_imageOutput, imagemIn->row*imagemIn->col*sizeof(int), cudaMemcpyDeviceToHost);
+   error = cudaMemcpy(imagemOut->matrix, d_imageOutput, imagemIn->row*imagemIn->col*imagemIn->channels*sizeof(int), cudaMemcpyDeviceToHost);
    if(error!=cudaSuccess) {
       printf("Memory Copy CUDA failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(error));
       exit(EXIT_FAILURE);

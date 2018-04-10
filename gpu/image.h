@@ -20,4 +20,4 @@ void createImage(PGMData *data, int row, int col, int max_intensity, int channel
 void readImage(const char *file_name, PGMData *data);
 
 // Grava um arquivo PGM
-void writeImage(const char *filename, const PGMData *data, unsigned char binary, int channels);
+void writeImage(const char *filename, const PGMData *data, unsigned char binary);
