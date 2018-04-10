@@ -1,4 +1,7 @@
-// https://ugurkoltuk.wordpress.com/2010/03/04/an-extreme-simple-pgm-io-api/
+// Leitura de arquivos PGM, PPM, etc
+// Criado por: Luciano P. Soares (10 de Abril de 2018)
+// originalmente baseado em: ugurkoltuk.wordpress.com/2010/03/04/an-extreme-simple-pgm-io-api/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>

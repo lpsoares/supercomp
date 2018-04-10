@@ -21,7 +21,7 @@ int main() {
 
    cudaError_t error;
 
-   n=2<<28;
+   n=1<<29;
 
    // Aloca vetores na memoria da CPU
    h_a = (float *)malloc(n*sizeof(float));
@@ -68,7 +68,7 @@ int main() {
    }
 
    // Realiza calculo na GPU
-   add<<<ceil(n/256),256>>>(d_a,d_b,d_c,n);
+   add<<<ceil(n/(float)256),256>>>(d_a,d_b,d_c,n);
 
    // Retorna valores da memoria da GPU para a CPU
    error = cudaMemcpy(h_c, d_c, n*sizeof(float), cudaMemcpyDeviceToHost);
@@ -83,9 +83,13 @@ int main() {
    cudaFree(d_c);
 
    // Exibe um resultado para checar se valores conferem
-   printf("a[%d] + b[%d] = c[%d]\n",n/2,n/2,n/2);
-   printf("%6.1f + %6.1f = %6.1f\n",h_a[n/2],h_b[n/2],h_c[n/2]);
-
+   for(i=0;i<n;i++) {
+      if(!(i%(n/8))) {
+         printf("a[%d] + b[%d] = c[%d] => ",i,i,i);
+         printf("%6.1f + %6.1f = %6.1f\n",h_a[i],h_b[i],h_c[i]);
+      }
+   }
+   
    // Libera memoria da CPU
    free(h_a);
    free(h_b);

@@ -58,7 +58,7 @@ int main(int argc, char** argv) {
    free(imagemIn->matrix);
 
    // Dimensoes para organizar na GPU
-   dim3 dimGrid(ceil(imagemIn->row/16.0), ceil(imagemIn->col/16.0), 1);
+   dim3 dimGrid(ceil(imagemIn->row/(float)16.0), ceil(imagemIn->col/(float)16.0), 1);
    dim3 dimBlock(16, 16, 1);
 
    // Realiza conversao na GPU
