@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-/* Rotina para copiar dois vetores na GPU */ 
+/* Rotina para somar dois vetores na GPU */ 
 __global__ void add(float *a, float *b, float *c, int N) {
    int i=blockIdx.x*blockDim.x+threadIdx.x;
    if(i<N) {   // Importante checar valor do i pois pode acessar fora do tamanho do vetor
