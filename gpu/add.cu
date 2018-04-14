@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 /* Rotina para copiar dois vetores na GPU */ 
-__global__ void add(float *a, float *b, float *c, int N) {
+__global__ void add(double *a, double *b, double *c, int N) {
    int i=blockIdx.x*blockDim.x+threadIdx.x;
    if(i<N) {   // Importante checar valor do i pois pode acessar fora do tamanho do vetor
       c[i] = a[i] + b[i];
@@ -15,39 +15,39 @@ __global__ void add(float *a, float *b, float *c, int N) {
 /* Programa cria dois vetores e soma eles em GPU */
 int main() {
 
-   float *h_a, *h_b, *h_c;
-   float *d_a, *d_b, *d_c;
-   int i, n;
+   double *h_a, *h_b, *h_c;
+   double *d_a, *d_b, *d_c;
+   int    blocksize, i, n;
 
    cudaError_t error;
 
-   n=1<<29;
+   n=1<<28;
 
    // Aloca vetores na memoria da CPU
-   h_a = (float *)malloc(n*sizeof(float));
-   h_b = (float *)malloc(n*sizeof(float));
-   h_c = (float *)malloc(n*sizeof(float));
+   h_a = (double *)malloc(n*sizeof(double));
+   h_b = (double *)malloc(n*sizeof(double));
+   h_c = (double *)malloc(n*sizeof(double));
 
    // Preenche os vetores
    for (i = 0; i < n; i++) {
-    h_a[i] = (float)n;
-    h_b[i] = (float)n;
+    h_a[i] = (double)i;
+    h_b[i] = (double)n-i;
    }
 
    // Aloca vetores na memoria da GPU
-   error = cudaMalloc((void **)&d_a,n*sizeof(float));
+   error = cudaMalloc((void **)&d_a,n*sizeof(double));
    if(error!=cudaSuccess) {
       printf("Memory Allocation CUDA failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(error));
       exit(EXIT_FAILURE);
    }
 
-   error = cudaMalloc((void **)&d_b,n*sizeof(float));
+   error = cudaMalloc((void **)&d_b,n*sizeof(double));
    if(error!=cudaSuccess) {
       printf("Memory Allocation CUDA failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(error));
       exit(EXIT_FAILURE);
    }
 
-   error = cudaMalloc((void **)&d_c,n*sizeof(float));
+   error = cudaMalloc((void **)&d_c,n*sizeof(double));
    if(error!=cudaSuccess) {
       printf("Memory Allocation CUDA failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(error));
       exit(EXIT_FAILURE);
@@ -55,23 +55,24 @@ int main() {
 
 
    // Copia valores da CPU para a GPU
-   error = cudaMemcpy(d_a, h_a, n*sizeof(float), cudaMemcpyHostToDevice);
+   error = cudaMemcpy(d_a, h_a, n*sizeof(double), cudaMemcpyHostToDevice);
    if(error!=cudaSuccess) {
       printf("Memory Copy CUDA failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(error));
       exit(EXIT_FAILURE);
    }
 
-   error = cudaMemcpy(d_b, h_b, n*sizeof(float), cudaMemcpyHostToDevice);
+   error = cudaMemcpy(d_b, h_b, n*sizeof(double), cudaMemcpyHostToDevice);
    if(error!=cudaSuccess) {
       printf("Memory Copy CUDA failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(error));
       exit(EXIT_FAILURE);
    }
 
    // Realiza calculo na GPU
-   add<<<ceil(n/(float)256),256>>>(d_a,d_b,d_c,n);
+   blocksize = 256;
+   add<<<((n-1)/256 + 1),blocksize>>>(d_a,d_b,d_c,n);
 
    // Retorna valores da memoria da GPU para a CPU
-   error = cudaMemcpy(h_c, d_c, n*sizeof(float), cudaMemcpyDeviceToHost);
+   error = cudaMemcpy(h_c, d_c, n*sizeof(double), cudaMemcpyDeviceToHost);
    if(error!=cudaSuccess) {
       printf("Memory Copy CUDA failure %s:%d: '%s'\n",__FILE__,__LINE__,cudaGetErrorString(error));
       exit(EXIT_FAILURE);
