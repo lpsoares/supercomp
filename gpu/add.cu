@@ -21,7 +21,7 @@ int main() {
 
    cudaError_t error;
 
-   n=1<<28;
+   n=1<<23;
 
    // Aloca vetores na memoria da CPU
    h_a = (double *)malloc(n*sizeof(double));
