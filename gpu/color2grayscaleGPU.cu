@@ -7,7 +7,7 @@
 #include "image.h" 
 
 
-/* Rotina para copiar dois vetores na GPU */ 
+/* Rotina para converter imagem colorida em tons de cinza na GPU */ 
 __global__ void convert3RGBtoGrayScale(int *input3RGB, int *output1GrayScale, int height, int width) {
    int i=blockIdx.x*blockDim.x+threadIdx.x;
    int j=blockIdx.y*blockDim.y+threadIdx.y;
@@ -17,7 +17,7 @@ __global__ void convert3RGBtoGrayScale(int *input3RGB, int *output1GrayScale, in
    }
 }
 
-/* Programa cria dois vetores e soma eles em GPU */
+/* Programa cria converter imagem colorida em tons de cinza em GPU */
 int main(int argc, char** argv) {
 
    int *d_imageInput, *d_imageOutput;
