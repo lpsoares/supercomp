@@ -13,14 +13,14 @@
 __global__ void blur(int *input, int *output, int height, int width) {
    int i=blockIdx.x*blockDim.x+threadIdx.x;
    int j=blockIdx.y*blockDim.y+threadIdx.y;
-   if( i<width && j<height ) {   // Importante checar valor do i pois pode acessar fora do tamanho do vetor
+   if( i<height && j<width ) {   // Importante checar valor do i pois pode acessar fora do tamanho do vetor
 
       int total[3] = {0,0,0};
       int points = 0;
 
       for(int di = MAX(0, i - 1); di <= MIN(i + 1, height - 1); di++) {
          for(int dj = MAX(0, j - 1); dj <= MIN(j + 1, width - 1); dj++) {
-            int pos = dj*width + di;
+            int pos = di*width + dj;
             total[0] += input[ pos*3   ];
             total[1] += input[ pos*3+1 ];
             total[2] += input[ pos*3+2 ];
