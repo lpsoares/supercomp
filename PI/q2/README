@@ -1,0 +1,9 @@
+A pasta `exemplos` contém algumas entradas usadas para testar o código de vocês. Colocamos abaixo  sugestões de parâmetros usadas para testar cada uma delas.
+
+> ./q2 2000 0.01 < exemplos/entrada1
+> ./q2 10000 0.01  < exemplos/entrada2
+> ./q2  10000 0.01 < exemplos/entrada3
+> ./q2 1500 0.01 < exemplos/entrada4
+> ./q2 1000 0.001  < exemplos/entrada5
+
+Os programas acima demoram no máximo 5 minutos para rodar em suas versões sequenciais e chegam em valores respeitáveis de erro. 
